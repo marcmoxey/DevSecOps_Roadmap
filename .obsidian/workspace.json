@@ -1,0 +1,209 @@
+{
+  "main": {
+    "id": "cc1bf7825475babf",
+    "type": "split",
+    "children": [
+      {
+        "id": "180a044cb8014726",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dcaca4210a542133",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Stage_002/Python.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Python"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "4dec6fb021aa4aee",
+    "type": "split",
+    "children": [
+      {
+        "id": "975d3153bbe07c32",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1983c8c95728a9c3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": true
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "084e31029f24e33a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "e8a03dd0232940ff",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200
+  },
+  "right": {
+    "id": "857da545880e11ca",
+    "type": "split",
+    "children": [
+      {
+        "id": "67ff36b3205dcac4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "382a3d52036563d1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Linux & Networking/Linux/Linux Fundamentals - 001.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Linux Fundamentals - 001"
+            }
+          },
+          {
+            "id": "ee97d18d5d46e66b",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Linux & Networking/Linux/Linux Fundamentals - 001.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Linux Fundamentals - 001"
+            }
+          },
+          {
+            "id": "b840a3ef0bd56ad4",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "c6f13a8533fc502e",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "b40c4c95f878b751",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Linux & Networking/Linux/Linux Fundamentals - 001.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Linux Fundamentals - 001"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "dcaca4210a542133",
+  "lastOpenFiles": [
+    "Stage_002/Ch_006/CoinFlipStreaks.py",
+    "Stage_002/Ch_006/tmp0bnsvg84",
+    "Stage_002/Ch_006/tmpyn9iiw22",
+    "Stage_002/Ch_006/tmpg86x4mzs",
+    "Stage_002/Ch_006/CommaCode.py",
+    "Stage_002/Ch_006/matrixscreensaver.py",
+    "Stage_002/Ch_006/tmpmrmij6hf",
+    "Stage_002/Ch_006/magic8Ball2.py",
+    "Stage_002/Ch_006/tmpr7n32b8o",
+    "Stage_002/Ch_006/myPets.py",
+    "Stage_002/Ch_006/allMyCats2.py",
+    "Stage_002/Python.md",
+    "Bash Scripting/Scripting.md",
+    "Bash Scripting/Disk-Usage.md",
+    "Linux & Networking/Linux/Linux Fundamentals - Journal.md",
+    "Pasted image 20260615100540 1.png",
+    "Pasted image 20260615100540.png",
+    "Untitled.canvas",
+    "Welcome.md"
+  ]
+}
