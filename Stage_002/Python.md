@@ -1,10 +1,8 @@
 # Python — Journal (Stage 2)
 
-Resource: Automate the Boring Stuff with Python (3rd edition) — https://automatetheboringstuff.com/
+Coming from C#/ASP.NET — most of chapters 1-10 will be new SYNTAX for concepts already known, not new concepts. For each entry, the useful question is: "Is this new, or is this just Python's way of writing something I already know from C#?" Slow down only where the answer is genuinely new.
 
-Coming from C#/ASP.NET  most of chapters 1-10 will be new SYNTAX for concepts already known, not new concepts. For each entry, the useful question is: "Is this new, or is this just Python's way of writing something I already know from C#?" Slow down only where the answer is genuinely new.
-
-
+Note: conda activate abspython - spyder
 
 Same template as the Bash Scripting journal:
 
@@ -522,39 +520,283 @@ else:
 
 ---
 
-## Date:
+## Date: 06/20/2026
 
 **Topic:** Strings and Text Editing (ch. 8)
 
 **Code:**
 
-**What happened:**
+```python
+# Escape characters and raw strings
+print("Hello there!\nHow are you?\nI\'m doing fine")
+print(r'The file is in C:\Users\Alice\Desktop')   # raw string — \n is literal, not a newline
 
-**Learned (vs C#):**
+# Indexing and slicing (same rules as lists)
+greeting = 'Hello, world!'
+print(greeting[0])        # 'H'
+print(greeting[-1])        # '!'
+print(greeting[7:])         # 'world!'
+
+# in / not in
+print('Hello' in 'Hello, world!')     # True
+print('cats' not in 'cats and dogs')  # False
+
+# f-strings (the modern way to build strings)
+name = 'Ai'
+age = 4000
+print(f'My name is {name}. I am {age} years old')
+print(f'In 10 years I will be {age + 10}')     # expressions work inside {}
+print(f'{{name}}')                                # literal {name} — double braces escape
+
+# Useful string methods
+spam = 'Hello, world!'
+print(spam.upper())             # 'HELLO, WORLD!'
+print(spam.lower())              # 'hello, world!'
+print('hello123'.isalpha())      # False — has digits
+print('hello'.isalnum())          # True — letters and/or numbers only
+print('  '.isspace())              # True
+print('Hello, world1'.startswith('Hello'))   # True
+
+# Joining and splitting
+print(', '.join(['cats', 'rats', 'bats']))           # 'cats, rats, bats'
+print('MyABCnameABCisABCSimon'.split('ABC'))          # ['My', 'name', 'is', 'Simon']
+
+multiline = '''Dear Alice,
+There is a milk bottle in the fridge.
+Sincerely,
+Bob'''
+print(multiline.split('\n'))     # splits into a list, one item per line
+
+# Justify and pad
+print('Hello'.rjust(10))           # right-aligned, padded with spaces
+print('Hello'.rjust(20, '*'))      # padded with '*' instead
+print('Hello'.center(20, '='))     # centered
+
+# Whitespace removal
+spam = '       Hello, World             '
+print(spam.strip())    # removes leading AND trailing whitespace
+print(spam.lstrip())   # left only
+print(spam.rstrip())   # right only
+
+spam = 'SpamSpamBaconSpamEggsSpamSpam'
+print(spam.strip('ampS'))   # strips any of those CHARACTERS from both ends, not the literal substring
+
+# ord() and chr() — character <-> numeric code point
+print(ord('A'))      # 65
+print(chr(65))         # 'A'
+
+# Clipboard (pyperclip)
+import pyperclip
+text = pyperclip.paste()   # read clipboard
+pyperclip.copy(result)      # write to clipboard
+```
+
+**What happened:** Worked through the full string chapter — escape characters, raw strings, f-strings (and the `{{ }}` escape for literal braces), the major string methods (`upper`/`lower`/`isalpha`/`isalnum`/`startswith`/`endswith`), joining/splitting, justify/pad (`rjust`/`ljust`/`center`), whitespace stripping, and `ord()`/`chr()`. Also completed end-of-chapter projects without initially realizing that's what they were: `pigLatin.py` (full English-to-Pig-Latin translator — the hardest exercise in the chapter), `bulletPointAdder.py` (reads clipboard text, adds `*` to the start of every line, copies back), and `alternatingText.py` (aLtErNaTiNg CaSe converter using clipboard). Also built `feedcat.py` (multiline strings with triple quotes) and `validateInput.py` (using `.isdecimal()` and `.isalnum()` for input validation loops).
+
+**Learned (vs C#):** F-strings (`f'{name}'`) are the direct equivalent of C#'s string interpolation (`$"{name}"`) — same idea, different prefix letter. Raw strings (`r'...'`) have no real C# equivalent for normal strings, but are similar in spirit to C#'s verbatim strings (`@"..."`) — both stop escape sequences from being interpreted. `strip('ampS')` was a genuine surprise: it doesn't strip the literal substring `"ampS"` — it strips any _characters_ found in that set from both ends, which is different from how `.Trim()` works with a substring in some other languages. String slicing uses the exact same `[start:end]` rules as list slicing from ch. 6 — confirms strings and lists share the same "sequence type" behavior in Python, which is a unifying concept C# doesn't really have (strings and arrays are more separate there).
 
 ---
 
-## Date:
+---
+
+## Date: 06/21/2026 - 06/22/2026
 
 **Topic:** Text Pattern Matching with Regular Expressions (ch. 9) — pair with TryHackMe Regex room
 
 **Code:**
 
-**What happened:**
+```python
+import re
 
-**Learned:**
+# Basic compile + search
+phone_num_pattern_obj = re.compile(r'\d{3}-\d{3}-\d{4}')
+match_obj = phone_num_pattern_obj.search('My number is 415-555-4242')
+print(match_obj.group())   # '415-555-4242'
+
+# Grouping with parentheses
+phone_re = re.compile(r'(\d\d\d)-(\d\d\d-\d\d\d\d)')
+mo = phone_re.search('My number is 415-555-4242')
+print(mo.group(1))    # '415'       — first group
+print(mo.group(2))    # '555-4242'  — second group
+print(mo.group(0))    # '415-555-4242' — full match
+area_code, main_number = mo.groups()   # unpack all groups at once
+
+# Escape characters inside regex (literal parentheses need escaping)
+pattern = re.compile(r'(\(\d\d\d\)) (\d\d\d-\d\d\d\d)')
+mo = pattern.search('My phone number is (415) 555-4242')
+print(mo.group(1))    # '(415)'
+
+# Alternation with |
+pattern = re.compile(r'Cat(cerpiler|astrophe|ch|egory)')
+match = pattern.search('Catch me if you can')
+print(match.group())    # 'Catch'
+print(match.group(1))   # 'ch'
+
+# findall() — returns all matches
+pattern = re.compile(r'\d{3}-\d{3}-\d{4}')  # no groups
+result = pattern.findall('Cell: 415-555-9999 Work: 212-555-0000')
+print(result)    # ['415-555-9999', '212-555-0000']
+
+pattern = re.compile(r'(\d{3})-(\d{3})-(\d{4})')  # with groups
+result = pattern.findall('Cell: 415-555-9999 Work: 212-555-0000')
+print(result)    # [('415', '555', '9999'), ('212', '555', '0000')]
+# findall with groups → list of TUPLES, not list of strings
+
+# Character classes
+vowel_pattern = re.compile(r'[aeiouAEIOU]')
+result = vowel_pattern.findall('RoboCop eats BABY FOOD')
+
+consonant_pattern = re.compile(r'[^aeiouAEIOU]')  # ^ inside [] = NOT
+result = consonant_pattern.findall('RoboCop eats BABY FOOD')
+
+# Shorthand classes
+pattern = re.compile(r'\d+\s\w+')
+result = pattern.findall('12 drummers, 11 pipers, 10 lords')
+
+# Dot — matches any character EXCEPT newline
+at_re = re.compile(r'.at')
+result = at_re.findall('The cat in the hat sat on the flat mat.')
+print(result)    # ['cat', 'hat', 'sat', 'lat', 'mat'] — 'flat' gives 'lat'
+
+# ? optional, * zero or more, + one or more
+pattern = re.compile(r'(\d{3}-)?\d{3}-\d{4}')
+print(pattern.search('415-555-4242').group())   # area code present
+print(pattern.search('555-4242').group())         # area code absent — both work
+
+# {n,m} specific repetition
+haRegex = re.compile(r'(Ha){3}')
+print(haRegex.search('HaHaHa').group())    # 'HaHaHa' ✅
+print(haRegex.search('Haha') == None)       # True — case sensitive, only 1 'Ha'
+
+# Greedy vs non-greedy
+greedy_pattern = re.compile(r'(Ha){3,5}')
+print(greedy_pattern.search('HaHaHaHaHa').group())   # 'HaHaHaHaHa' — grabs max (5)
+
+lazy_pattern = re.compile(r'(Ha){3,5}?')
+print(lazy_pattern.search('HaHaHaHaHa').group())     # 'HaHaHa' — grabs min (3)
+
+# .* vs .*? (greedy vs non-greedy with dot)
+greedy_re = re.compile(r'<.*>')
+print(greedy_re.search('<To serve man> for dinner.>').group())
+# '<To serve man> for dinner.>' — grabs as much as possible
+
+lazy_re = re.compile(r'<.*?>')
+print(lazy_re.search('<To serve man> for dinner.>').group())
+# '<To serve man>' — stops at first > found
+
+# re.DOTALL — make . match newlines too
+newline_re = re.compile('.*', re.DOTALL)
+result = newline_re.search('Serve the public trust.\nProtect the innocent.').group()
+
+# Anchors
+begins_with_hello = re.compile(r'^Hello')
+print(begins_with_hello.search('Hello, world!'))          # match
+print(begins_with_hello.search('He said "Hello."') == None)  # True — ^ anchors to start
+
+ends_with_number = re.compile(r'\d$')
+print(ends_with_number.search('Your number is 42'))         # match
+print(ends_with_number.search('Your number is forty two.') == None)  # True
+
+# Word boundaries
+pattern = re.compile(r'\bcat.*?\b')
+result = pattern.findall('The cat found a catapult')
+# \b = word boundary — matches 'cat ' but not 'cat' inside 'catapult'
+
+# re.IGNORECASE
+pattern = re.compile(r'robocop', re.I)
+print(pattern.search('Robocop is part man, part machine, all cop.').group())
+print(pattern.search('ROBOCOP protects the innocent').group())
+
+# Substitution with sub()
+agent_pattern = re.compile(r'Agent \w+')
+print(agent_pattern.sub('CENSORED', 'Agent Alice contacted Agent Bob'))
+# 'CENSORED contacted CENSORED'
+
+agent_pattern = re.compile(r'Agent (\w)\w*')
+print(agent_pattern.sub(r'\1****', 'Agent Alice contacted Agent Bob'))
+# 'A**** contacted B****' — \1 refers back to first group in replacement
+
+# Verbose mode — re.VERBOSE allows comments inside the pattern
+pattern = re.compile(r'''(
+    (\d{3}|\(\d{3}\))?  # Area code
+    (\s|-|\.)?           # Separator
+    \d{3}                # First three digits
+    (\s|-|\.)            # Separator
+    \d{4}                # Last four digits
+    (\s*(ext|x|ext\.)\s*\d{2,5})?  # Extension
+    )''', re.VERBOSE)
+
+# Combining flags
+some_regex = re.compile('foo', re.IGNORECASE | re.DOTALL | re.VERBOSE)
+
+# humre — human-readable regex (third-party module)
+from humre import *
+phone_regex = exactly(3, DIGIT) + '-' + exactly(3, DIGIT) + '-' + exactly(4, DIGIT)
+pattern = re.compile(phone_regex)
+```
+
+**What happened:** Worked through the complete regex chapter — `re.compile()` + `search()` + `group()`, grouping with parentheses, `findall()` returning strings vs tuples depending on whether groups exist, character classes `[...]` and negation `[^...]`, shorthand classes (`\d`, `\w`, `\s`), the dot `.`, all quantifiers (`?`, `*`, `+`, `{n}`, `{n,m}`), greedy vs non-greedy (`{3,5}` vs `{3,5}?`), anchors (`^` and `$`), word boundaries (`\b`), `re.DOTALL`, `re.IGNORECASE`, `sub()` for substitution with back-references, and `re.VERBOSE` for commenting complex patterns. Also built `isPhoneNumber.py` (the manual approach showing why regex exists — 18 lines of manual character checks vs one regex line) and the big end-of-chapter project `project_003.py` (phone + email finder that reads from clipboard and writes back to clipboard).
+
+Real issue caught: `begins_with_hello = re.compile(r'Hello')` (missing `^`) vs `re.compile(r'^Hello')` — without `^`, pattern matches `Hello` anywhere in the string, returning a Match object, not `None`. `== None` then returns `False` instead of `True`. One character difference, completely different behavior — always check anchors first when a regex returns unexpected results.
+
+**Learned (vs C#):** `re.compile()` + `.search()` + `.group()` is Python's equivalent of C#'s `Regex.Match()` — conceptually the same, different syntax. `findall()` has no direct C# equivalent; it returns either a list of strings (no groups) or a list of tuples (with groups) — this switch in return type based on whether groups exist is a genuine gotcha with no C# parallel to anchor onto. Greedy vs non-greedy matching (`{3,5}` vs `{3,5}?`) — the `?` after a quantifier makes it lazy/non-greedy, grabbing as few characters as possible; without it, Python grabs as many as possible (greedy default). `re.VERBOSE` makes complex regex maintainable — lets you spread a pattern across multiple lines with `#` comments, same readability benefit as well-commented code. `re.IGNORECASE | re.DOTALL | re.VERBOSE` — combining flags with `|` (bitwise OR) is the standard pattern for passing multiple options. `sub()` with a back-reference (`r'\1****'`) in the replacement string — `\1` refers to the first captured group in the match, letting you partially preserve what you matched while replacing the rest.
 
 ---
 
-## Date:
+## Date: 06/22/2026
 
-**Topic:** Reading and Writing Files (ch. 10)
+**Topic:** Project — Phone & Email Address Finder (project_003.py, end-of-ch.9 project)
 
 **Code:**
 
-**What happened:**
+```python
+import pyperclip, re
 
-**Learned (vs C#):**
+# Phone number regex — handles multiple formats:
+# 415-555-4242, (415) 555-4242, 415.555.4242, with optional extension
+phone_re = re.compile(r'''(
+    (\d{3}|\(\d{3}\))?  # Area code (optional, plain or parenthesized)
+    (\s|-|\.)?           # Separator (optional)
+    (\d{3})              # First three digits
+    (\s|-|\.)            # Separator (required here)
+    (\d{4})              # Last four digits
+    (\s*(ext|x|ext\.)\s*(\d{2,5}))?  # Extension (optional)
+    )''', re.VERBOSE)
+
+# Email address regex
+email_re = re.compile(r'''(
+    [a-zA-Z0-9._%+-]+    # Username
+    @                     # @ symbol
+    [a-zA-Z0-9.-]+        # Domain name
+    (\.[a-zA-Z]{2,4})     # Top-level domain (.com, .org, .io etc.)
+    )''', re.VERBOSE)
+
+# Read clipboard, search for matches
+text = str(pyperclip.paste())
+matches = []
+
+for groups in phone_re.findall(text):
+    phone_num = '-'.join([groups[1], groups[3], groups[5]])
+    if groups[6] != '':
+        phone_num += ' x' + groups[6]
+    matches.append(phone_num)
+
+for groups in email_re.findall(text):
+    matches.append(groups[0])
+
+# Copy results back to clipboard or report no matches
+if len(matches) > 0:
+    pyperclip.copy('\n'.join(matches))
+    print('Copied to clipboard')
+    print('\n'.join(matches))
+else:
+    print('No phone number or email address found')
+```
+
+**What happened:** This project combines everything from ch. 9 into one real, usable tool — copy any block of text (a webpage, email, document) to the clipboard, run the script, and it finds every phone number and email address and copies them back to the clipboard, ready to paste. Used `re.VERBOSE` to make the complex phone regex readable with inline comments. The phone regex handles multiple formats by making the area code and separators optional (`?`). Used `findall()` which returns tuples (since groups exist), then indexed into specific tuple positions to reconstruct a standardized `NNN-NNN-NNNN` format regardless of what format the original was in.
+
+**Learned:** `re.VERBOSE` is genuinely worth using for any regex longer than ~10 characters — the inline comments make what would be an unreadable symbol string into something you can actually maintain and explain. The `isPhoneNumber.py` manual approach (18 lines, checks each character position individually) vs the one-line regex approach is a direct demonstration of WHY regex exists — the comparison makes the value obvious rather than abstract. Indexing specific tuple positions from `findall()` (`groups[1]`, `groups[3]`, `groups[5]`) to reconstruct a standardized output format is a common real-world pattern: match flexibly, output consistently.
+
 
 ---
 
@@ -617,7 +859,3 @@ else:
 **Learned:**
 
 ---
-
-## Notes / things to revisit later
-
-- Chapters skipped on purpose (office/desktop automation, not infra-relevant): 11 (Organizing Files), 13 (Web Scraping — optional skim), 14 (Excel), 15 (Google Sheets), 16 (SQLite — optional later for local DB work), 17 (PDF/Word), 20 (Email/Texts — optional later for alerting), 21-24 (graphs/images/keyboard-mouse/speech)
