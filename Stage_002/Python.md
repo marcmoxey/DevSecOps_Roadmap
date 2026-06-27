@@ -797,6 +797,184 @@ else:
 
 **Learned:** `re.VERBOSE` is genuinely worth using for any regex longer than ~10 characters — the inline comments make what would be an unreadable symbol string into something you can actually maintain and explain. The `isPhoneNumber.py` manual approach (18 lines, checks each character position individually) vs the one-line regex approach is a direct demonstration of WHY regex exists — the comparison makes the value obvious rather than abstract. Indexing specific tuple positions from `findall()` (`groups[1]`, `groups[3]`, `groups[5]`) to reconstruct a standardized output format is a common real-world pattern: match flexibly, output consistently.
 
+**Code:**
+
+**What happened:**
+
+**Learned (vs C#):**
+
+---
+
+## Date: 06/24/2026
+
+**Topic:** Reading and Writing Files (ch. 10)
+
+**Code:**
+
+```python
+from pathlib import Path
+import os, time, shelve
+
+# Path basics — joining paths
+Path('spam', 'bacon', 'eggs')              # join with comma
+Path('spam') / 'bacon' / 'eggs'           # join with / operator
+Path('spam') / Path('bacon/eggs')          # mix of styles — all equivalent
+
+# 'spam' / 'bacon' → TypeError — must have a Path object on the LEFT side of /
+
+# Current working directory and home
+print(Path.cwd())     # where Python is currently running from
+print(Path.home())    # C:\Users\moxey
+
+# Create directories
+Path(r'C:\Users\moxey\Desktop\newfolder').mkdir()   # creates one folder
+os.makedirs(r'C:\path\to\deep\folder')               # creates all missing parent folders too
+
+# Absolute vs relative paths
+Path.cwd().is_absolute()                   # True
+Path('spam/bacon/eggs').is_absolute()      # False
+Path('my/relative/path').absolute()        # converts to absolute using cwd
+
+# Parts of a filepath
+p = Path('C:/Users/Al/spam.txt')
+print(p.anchor)     # 'C:\\'
+print(p.parent)     # C:/Users/Al
+print(p.name)       # 'spam.txt'
+print(p.stem)       # 'spam'
+print(p.suffix)     # '.txt'
+print(p.drive)      # 'C:'
+print(p.parts)      # ('C:\\', 'Users', 'Al', 'spam.txt')
+print(p.parts[0:2]) # ('C:\\', 'Users')
+
+# Parent directories
+print(Path.cwd().parents[0])   # one level up
+print(Path.cwd().parents[1])   # two levels up
+
+# File size and timestamps
+calc_file = Path('C:/Windows/System32/calc.exe')
+print(calc_file.stat().st_size)    # size in bytes
+print(calc_file.stat().st_mtime)   # last modified (Unix timestamp)
+print(time.asctime(time.localtime(calc_file.stat().st_mtime)))  # human readable
+
+# Glob — find files matching a pattern
+p = Path('C:/Users/moxey/Desktop')
+for name in p.glob('*'):      # * = all files/folders
+    print(name)
+for name in p.glob('*.py'):   # only .py files
+    print(name)
+for name in p.glob('**/*.py'): # ** = recursive search into subfolders
+    print(name)
+
+# Checking path validity
+print(Path('C:/Windows').exists())          # True
+print(Path('C:/Windows').is_dir())          # True
+print(Path('C:/Windows/calc.exe').is_file()) # False (wrong location)
+print(Path('C:/NoSuchFolder').exists())      # False
+
+# Simple file read/write with pathlib
+p = Path('spam.txt')
+p.write_text('Hello, world!')    # writes and closes automatically
+print(p.read_text())              # reads and closes automatically
+
+# Traditional open() — read mode
+hello_file = open(r'C:\Users\moxey\Desktop\DevSecOps_Roadmap\Stage_002\Ch_010\hello.txt', encoding='UTF-8')
+hello_content = hello_file.read()    # reads entire file as one string
+print(hello_content)
+hello_file.close()                    # must close manually
+
+# readlines() — reads into a list, one line per item
+sonnet_file = open(r'C:\Users\moxey\Desktop\DevSecOps_Roadmap\Stage_002\Ch_010\sonnet29.txt')
+lines = sonnet_file.readlines()
+print(lines)     # ['When, in disgrace...\n', 'With Fortune...\n', ...]
+sonnet_file.close()
+
+# Write mode ('w') — creates or OVERWRITES the file
+bacon_file = open('bacon.txt', 'w', encoding='UTF-8')
+bacon_file.write('Hello, world\n')
+bacon_file.close()
+
+# Append mode ('a') — adds to end of file without overwriting
+bacon_file = open('bacon.txt', 'a', encoding='UTF-8')
+bacon_file.write('Bacon is not a vegetable')
+bacon_file.close()
+
+# with statement — automatically closes file even if an error occurs
+with open('data.txt', 'w', encoding='UTF-8') as file_obj:
+    file_obj.write('This was written with a with statement')
+with open('data.txt', encoding='UTF-8') as file_obj:
+    content = file_obj.read()
+print(content)
+
+# shelve — saves Python objects to a binary file (like a persistent dict)
+shelf_file = shelve.open('mydata')
+shelf_file['cats'] = ['Zophie', 'Pooka', 'Simon']   # store a list
+shelf_file.close()
+
+shelf_file = shelve.open('mydata')
+print(shelf_file['cats'])           # ['Zophie', 'Pooka', 'Simon']
+print(list(shelf_file.keys()))
+print(list(shelf_file.values()))
+shelf_file.close()
+```
+
+**What happened:** Worked through the full file I/O chapter — `pathlib` for path manipulation (joining, checking existence, glob), `open()` for reading/writing, three file modes (`'r'` read, `'w'` write/overwrite, `'a'` append), `.read()` vs `.readlines()`, the `with` statement for automatic file closing, and `shelve` for persisting Python objects across script runs. Hit two real errors: (1) `PermissionError` — tried to `open()` a folder path (`Ch_010`) instead of a file — fixed by adding a filename at the end. (2) `FileNotFoundError` — tried to open `hello.txt` before it existed — fixed by creating it with `Path.write_text()` first.
+
+**Learned (vs C#):** `Path` / operator for joining paths is unique to Python — no equivalent in C# (you'd use `Path.Combine()`). `pathlib`'s `.write_text()` and `.read_text()` are the simplest way to read/write a file in one line — much cleaner than C#'s `File.WriteAllText()` / `File.ReadAllText()` though conceptually the same. Three file modes (`'r'`, `'w'`, `'a'`) match C#'s `FileMode.Open`, `FileMode.Create`, `FileMode.Append` — same concepts, different syntax. The `with` statement for file handling is Python's equivalent of C#'s `using` statement — both automatically dispose/close the resource when the block exits, even if an exception occurs. `open()` without `with` requires a manual `.close()` call — forgetting it can cause file lock issues or data loss, same risk as forgetting `.Dispose()` in C# without `using`. `shelve` has no clean C# equivalent — it's like a persistent dictionary backed by a binary file, useful for caching Python objects between script runs without needing a full database.
+
+---
+
+## Date: 06/24/2026
+
+**Topic:** Project — Random Quiz Generator (randomQuizGenerator.py, end-of-ch.10 project)
+
+**Code:**
+
+```python
+import random
+
+capitals = {'Alabama': 'Montgomery', 'Alaska': 'Juneau', ...}  # 50 states
+
+for quiz_num in range(35):
+    # Open both files at once — quiz sheet and answer key
+    quiz_file = open(f'capitalsquiz{quiz_num + 1}.txt', 'w', encoding='UTF-8')
+    answer_file = open(f'capitalsquiz_answers{quiz_num + 1}.txt', 'w', encoding='UTF-8')
+
+    # Write header
+    quiz_file.write('Name:\n\nDate:\n\nPeriod:\n\n')
+    quiz_file.write((' ' * 20) + f'State Capitals Quiz (Form{quiz_num + 1})\n\n')
+
+    # Shuffle states so each quiz has different question order
+    states = list(capitals.keys())
+    random.shuffle(states)
+
+    for num in range(50):
+        correct_answer = capitals[states[num]]
+
+        # Build 3 wrong answers from remaining capitals
+        wrong_answers = list(capitals.values())
+        del wrong_answers[wrong_answers.index(correct_answer)]
+        wrong_answers = random.sample(wrong_answers, 3)
+
+        # Combine and shuffle all 4 answer options
+        answer_options = wrong_answers + [correct_answer]
+        random.shuffle(answer_options)
+
+        # Write question + 4 options (A/B/C/D)
+        quiz_file.write(f'{num + 1}. Capital of {states[num]}:\n')
+        for i in range(4):
+            quiz_file.write(f"    {'ABCD'[i]}. {answer_options[i]}\n")
+        quiz_file.write('\n')
+
+        # Write answer key — find which letter the correct answer landed on
+        answer_file.write(f"{num + 1}.{'ABCD'[answer_options.index(correct_answer)]}\n")
+
+    quiz_file.close()
+    answer_file.close()
+```
+
+**What happened:** Generates 35 different quiz files plus their answer keys, all with shuffled question and answer order so no two quizzes are identical. One real bug spotted in the uploaded version: the question line was written twice (`quiz_file.write(f'{num + 1}. Capital of {states[num]}:\n')` appeared twice in a row) — a copy-paste duplication that would print every question heading twice on the actual quiz file.
+
+**Learned:** Opening multiple files simultaneously (quiz file + answer key file) and writing to both inside the same loop is a real pattern — each file gets its corresponding content in lock-step as the loop runs. `'ABCD'[i]` is a clean Python idiom for converting a 0-3 index into a letter label — indexing directly into a string rather than needing a lookup dict or if/elif chain. `answer_options.index(correct_answer)` finds where the correct answer ended up after shuffling, so the answer key letter is always accurate regardless of what random order the options landed in — the logic is correct even without knowing in advance where the correct answer will be placed.
 
 ---
 
@@ -850,7 +1028,7 @@ else:
 
 ## Date:
 
-**Topic:** Putting it together — the SSH lab-check tool (Stage 2 build)
+**Topic:** Putting it together the SSH lab-check tool (Stage 2 build)
 
 **Final script:**
 
@@ -858,4 +1036,3 @@ else:
 
 **Learned:**
 
----
