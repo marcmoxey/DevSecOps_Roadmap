@@ -1,3 +1,4 @@
+
 # Python — Journal (Stage 2)
 
 Coming from C#/ASP.NET — most of chapters 1-10 will be new SYNTAX for concepts already known, not new concepts. For each entry, the useful question is: "Is this new, or is this just Python's way of writing something I already know from C#?" Slow down only where the answer is genuinely new.
@@ -978,15 +979,145 @@ for quiz_num in range(35):
 
 ---
 
-## Date:
+## Date: 06/28/2026
 
 **Topic:** Designing and Deploying Command Line Programs (ch. 12) — directly feeds the Stage 2 build (labcheck CLI tool)
 
 **Code:**
 
-**What happened:**
+```python
+# Color text with bext
+import bext
+bext.fg('red')
+print('This text is red')
+bext.bg('blue')
+print('Red text on a blue background')
+bext.fg('reset')
+bext.bg('reset')
+print('The text is normal again.')
 
-**Learned:**
+# Sound notification with playsound3
+import playsound3
+from pathlib import Path
+path = Path('C:/Users/moxey/Desktop/DevSecOps_Roadmap/Stage_002/Ch_012/hello.mp3')
+playsound3.playsound(path)   # must call playsound3.playsound(), not playsound3() directly
+
+# ccwd.py — copy current working directory to clipboard
+import pyperclip, os, sys
+if len(sys.argv) > 1:       # check if a path argument was passed
+    os.chdir(sys.argv[1])   # change to that directory first
+pyperclip.copy(os.getcwd()) # copy the current dir to clipboard
+
+# cliprec.py — clipboard recorder
+import pyperclip, time
+print('Recording clipboard... (Ctrl-C to stop)')
+previous_content = ''
+try:
+    while True:
+        content = pyperclip.paste()
+        if content != previous_content:
+            print(content)
+            previous_content = content
+        time.sleep(0.01)
+except KeyboardInterrupt:
+    pass
+
+# snowstorm.py — terminal animation using command line args
+import os, random, time, sys
+TOP    = chr(9600)   # ▀
+BOTTOM = chr(9604)   # ▄
+FULL   = chr(9608)   # █
+
+DENSITY = 4           # default snow density
+if len(sys.argv) > 1:
+    DENSITY = int(sys.argv[1])   # override with CLI arg
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+while True:
+    clear()
+    for y in range(20):
+        for x in range(40):
+            if random.randint(0, 99) < DENSITY:
+                print(random.choice([TOP, BOTTOM]), end='')
+            else:
+                print('', end='')
+        print()
+    print(FULL * 40 + '\n' + FULL * 40)
+    print('(Ctrl-C to stop.)')
+    time.sleep(0.2)
+```
+
+**What happened:** Worked through the chapter covering: terminal color/styling with `bext`, sound notifications with `playsound3`, reading command line arguments via `sys.argv`, the `ccwd` deployment pattern (Python script + `.bat` file + Scripts folder in PATH = runnable from anywhere in the terminal), and the clipboard recorder. Built four programs: `CLIPrograms.py` (bext colors + playsound3), `ccwd.py` (copy working directory to clipboard with optional path argument), `cliprec.py` (monitors clipboard for changes), `snowstorm.py` (terminal animation with configurable density via CLI argument).
+
+Real issues hit and fixed:
+
+- `playsound3('path')` → `TypeError: module is not callable` — fixed by calling `playsound3.playsound(path)` (the function inside the module, not the module itself)
+- `(sys.argv) > 1` → comparing a list to a number — fixed to `len(sys.argv) > 1`
+- `bext` not in conda channels → installed via `pip install bext` instead
+- `pip install bext` downgraded colorama (0.4.6 → 0.4.5) which broke Spyder/Sphinx → fixed with `pip install --upgrade colorama`
+- `ccwd` not recognized in terminal → Scripts folder not in PATH yet → added `C:\Users\moxey\Scripts` to User environment variables
+- pyperclip not found when running via `.bat` → had to install it specifically into the Scripts `.venv` (separate from conda environment)
+
+**Learned (vs C#):** `sys.argv` is Python's equivalent of C#'s `string[] args` in `Main(string[] args)` — same concept (command line arguments as a list/array), different syntax. `sys.argv[0]` is always the script name itself, so `sys.argv[1]` is the first actual argument — that's why the check is `len(sys.argv) > 1` not `> 0`. The deployment pattern (`.py` script + `.bat` launcher + Scripts folder in PATH) is the Windows equivalent of installing a CLI tool globally — the `.bat` activates the right virtual environment and passes arguments through with `%*`. This directly maps to what the labcheck tool needs to do: run from anywhere in the terminal with `labcheck --host 192.168.0.52` rather than `python C:\full\path\to\labcheck.py --host ...`. Dependency conflicts between packages (bext downgrading colorama breaking Spyder) is a real production problem — this is exactly what SCA tools like Dependabot catch in Stage 6 of the roadmap.
+
+---
+
+## Date: 06/28/2026
+
+**Topic:** argparse deep dive (Python docs tutorial — supplements ch. 12)
+
+**Code:**
+
+```python
+import argparse
+
+# 1. Positional arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("square", help="display a square of a given number", type=int)
+args = parser.parse_args()
+print(args.square**2)
+# python prog.py 4 → 16
+
+# 2. Optional arguments with store_true
+parser.add_argument("-v", "--verbosity", help="increase output verbosity", action='store_true')
+# store_true: flag is True if present, False if absent — no value needed after -v
+
+# 3. Combining positional + optional with action="count"
+parser.add_argument("square", type=int)
+parser.add_argument("-v", "--verbosity", action="count", default=0)
+# default=0 critical — without it verbosity is None, and None >= 2 raises TypeError
+
+# 4. nargs — number of values an argument consumes
+parser.add_argument('-n', nargs='+')   # one or more values (greedy)
+parser.add_argument('args', nargs='*') # zero or more values (positional)
+
+# -- separator: forces everything after it to be treated as positional, not a flag
+parser.parse_args(['--', '-f'])        # -f treated as value, not unknown flag
+parser.parse_args(['-n', '1', '--', '2', '3'])  # n gets ['1'], args gets ['2','3']
+
+# 5. Mutually exclusive group
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-v", "--verbose", action="store_true")
+group.add_argument("-q", "--quiet", action="store_true")
+# python prog.py 4 2 -vq → error: not allowed with argument
+
+# 6. Custom type converters with lambda
+parser = argparse.ArgumentParser(prefix_chars="-+")
+parser.add_argument('-a', metavar='<value>', action="append",
+                    type=lambda x: ('-', x))
+parser.add_argument('+a', metavar='<value>', action="append",
+                    type=lambda x: ('+', x))
+# lambda x: ('-', x) converts each value into a tuple (sign, value)
+# action="append" builds a list of tuples as -a/+a flags are repeated
+```
+
+**What happened:** Worked through the full argparse docs tutorial — positional arguments, optional arguments, `action='store_true'` vs `action='count'`, combining positional and optional, `nargs` for multi-value arguments, the `--` separator for ambiguous arguments, mutually exclusive groups, and custom type converters with lambda. Built one `prog.py` file with all examples staged as commented-out sections, progressively building up complexity.
+
+Real issue documented: `action="count"` without `default=0` sets verbosity to `None` when the flag isn't passed → `None >= 2` raises `TypeError: '>=' not supported between instances of 'NoneType' and 'int'`. Fixed by always setting `default=0` on count arguments used in numeric comparisons.
+
+**Learned (vs C#):** `action='store_true'` is Python's equivalent of a boolean flag — no value needed after the flag, just its presence/absence sets True/False (similar to nullable bool in C# but cleaner). `action='count'` has no direct C# CLI equivalent — it counts repetitions of the same flag (`-vvv` = 3), used for verbosity levels. `nargs='+'` (greedy, one or more) and `nargs='*'` (zero or more) map to `params` arrays in C# but with more explicit control. The `--` separator is a Unix convention with no C# equivalent — tells the parser to stop treating arguments as flags and treat everything after as literal values. `mutually_exclusive_group` handles the "either/or" constraint automatically with a built-in error message — in C# you'd write that validation logic yourself. `lambda` as `type=` converter is a concise way to transform argument values on parse — same as a one-line Func<string, T> in C#.
 
 ---
 
@@ -1028,7 +1159,7 @@ for quiz_num in range(35):
 
 ## Date:
 
-**Topic:** Putting it together the SSH lab-check tool (Stage 2 build)
+**Topic:** Putting it together — the SSH lab-check tool (Stage 2 build)
 
 **Final script:**
 
@@ -1036,3 +1167,4 @@ for quiz_num in range(35):
 
 **Learned:**
 
+---
