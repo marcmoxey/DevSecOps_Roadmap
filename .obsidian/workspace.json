@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Stage_002/Python.md",
+                "file": "Stage_002/Conda bash cmd.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Python"
+              "title": "Conda bash cmd"
             }
           }
         ]
@@ -186,21 +186,22 @@
   },
   "active": "c07e0552f3040bba",
   "lastOpenFiles": [
+    "Stage_002/Ch_019/tmpvzdl93l4",
+    "Stage_002/Ch_019/tmp7u_1mvfs",
+    "Stage_002/Ch_019/tmpd5olp7mm",
+    "Stage_002/Python.md",
+    "Stage_002/Ch_019/stopwatch.py",
+    "Stage_002/Ch_019/tmpx7365xl_",
+    "Stage_002/Ch_019/timestamp.py",
+    "Stage_002/Ch_019/Time_Scheduling.py",
     "Stage_002/Conda bash cmd.md",
     "Stage_002/Ch_012/cliprec.py",
     "Stage_002/Ch_012/ccwd.py",
     "Stage_002/Ch_012/tmpectg88ce",
     "Stage_002/Ch_012/tmp2rii8vf8",
-    "Stage_002/Ch_012/snowstorm.py",
-    "Stage_002/Ch_012/tmpm30jokmg",
-    "Stage_002/Ch_012/tmpntpi2cm5",
-    "Stage_002/Ch_012/tmpio_fjm5q",
-    "Stage_002/Ch_012/tmprd_qc8xr",
-    "Stage_002/Ch_012/hello.mp3",
     "Stage_001/Linux & Networking/Linux/Linux Fundamentals - Journal.md",
     "Stage_001/Bash Scripting/Disk-Usage.md",
     "Stage_001/Bash Scripting/Scripting.md",
-    "Stage_002/Python.md",
     "Bash Scripting/Scripting.md",
     "Bash Scripting/Disk-Usage.md",
     "Linux & Networking/Linux/Linux Fundamentals - Journal.md",
