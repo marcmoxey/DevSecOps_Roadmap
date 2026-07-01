@@ -1121,15 +1121,125 @@ Real issue documented: `action="count"` without `default=0` sets verbosity to `N
 
 ---
 
-## Date:
+## Date: 07/01/2026
 
 **Topic:** CSV, JSON, and XML Files (ch. 18) — important, used everywhere in cloud/AWS work
 
 **Code:**
 
-**What happened:**
+```python
+import csv, json, xml.etree.ElementTree as ET
 
-**Learned:**
+# ── CSV READING ──────────────────────────────────────────────
+# Basic csv.reader
+example_file = open('example3.csv')
+example_reader = csv.reader(example_file)
+example_data = list(example_reader)
+print(example_data[0][0])   # row 0, col 0
+print(example_data[1][1])   # row 1, col 1
+example_file.close()
+
+# Iterating with line_num
+for row in example_reader:
+    print('Row #' + str(example_reader.line_num) + ' ' + str(row))
+
+# ── CSV WRITING ──────────────────────────────────────────────
+output_file = open('output.csv', 'w', newline='')  # newline='' prevents double newlines on Windows
+output_writer = csv.writer(output_file)
+output_writer.writerow(['spam', 'eggs', 'bacon', 'ham'])
+output_writer.writerow(['Hello, world!', 'eggs', 'bacon', 'ham'])
+output_writer.writerow([1, 2, 3.141592, 4])
+output_file.close()
+
+# Tab-separated (TSV) with custom delimiter and line terminator
+output_file = open('output.tsv', 'w', newline='')
+output_writer = csv.writer(output_file, delimiter='\t', lineterminator='\n\n')
+output_writer.writerow(['spam', 'eggs', 'bacon', 'ham'])
+output_file.close()
+
+# ── DICTREADER / DICTWRITER ──────────────────────────────────
+# DictReader — uses header row as keys
+example_file = open('exampleWithHeader3.csv')
+example_dict_reader = csv.DictReader(example_file)
+for row in example_dict_reader:
+    print(row['Timestamp'], row['Fruit'], row['Quantity'])
+example_file.close()
+
+# DictReader — supply your own column names (no header in file)
+example_file = open('example3.csv')
+example_dict_reader = csv.DictReader(example_file, ['time', 'name', 'amount'])
+for row in example_dict_reader:
+    print(row['time'], row['name'], row['amount'])
+example_file.close()
+
+# DictWriter — write dicts as rows (order doesn't matter)
+output_file = open('output2.csv', 'w', newline='')
+output_dict_writer = csv.DictWriter(output_file, ['Name', 'Pet', 'Phone'])
+output_dict_writer.writeheader()
+output_dict_writer.writerow({'Name': 'Alice', 'Pet': 'cat', 'Phone': '555-1234'})
+output_dict_writer.writerow({'Name': 'Bob', 'Phone': '555-9999'})  # missing Pet → blank
+output_dict_writer.writerow({'Phone': '555-5555', 'Name': 'Carol', 'Pet': 'dog'})
+output_file.close()
+
+# ── JSON ─────────────────────────────────────────────────────
+# json.loads — parse JSON string → Python dict
+json_string = '{"name": "Alice", "age": 30, "car": null, "programmer": true}'
+python_data = json.loads(json_string)
+print(python_data)              # {'name': 'Alice', 'age': 30, 'car': None, 'programmer': True}
+print(type(python_data))        # <class 'dict'>
+
+# json.dumps — Python dict → JSON string
+json_string = json.dumps(python_data, indent=2)
+print(json_string)
+
+# ── XML ──────────────────────────────────────────────────────
+# Parsing XML with ElementTree
+xml_string = """<person>
+<name>Alice Doe</name>
+<age>30</age>
+<address>
+    <street>100 Larkin St.</street>
+    <city>San Francisco</city>
+</address>
+</person>"""
+
+root = ET.fromstring(xml_string)
+print(root.tag)         # 'person'
+print(root[0].tag)      # 'name'
+print(root[0].text)     # 'Alice Doe'
+
+# Iterate immediate children
+for elem in root:
+    print(elem.tag, '--', elem.text)
+
+# Iterate ALL descendants recursively
+for elem in root.iter():
+    print(elem.tag, '--', elem.text)
+
+# Find specific tags
+for elem in root.iter('number'):
+    print(elem.tag, '--', elem.text)
+
+# Writing XML with ElementTree
+person = ET.Element('person')
+name = ET.SubElement(person, 'name')
+name.text = 'Alice Doe'
+age = ET.SubElement(person, 'age')
+age.text = '30'
+result = ET.tostring(person, encoding='UTF-8')
+print(result)
+
+# xmltodict — parse XML directly to a Python dict (third party)
+import xmltodict
+python_data = xmltodict.parse(xml_string)
+print(python_data)   # OrderedDict — same structure as JSON equivalent
+```
+
+**What happened:** Worked through the full ch. 18 — CSV reading with `csv.reader` and `DictReader`, writing with `csv.writer` and `DictWriter`, custom delimiters (TSV), JSON parsing with `json.loads`/`json.dumps`, XML parsing with `xml.etree.ElementTree`, and `xmltodict` for converting XML directly to Python dicts. Built two programs: `CSV_JSON_XML_Files.py` (all chapter examples) and `removeCsvHeader.py` (end-of-chapter project — loops through all CSV files in a directory, strips the header row, writes the result to a `headerRemoved/` subfolder).
+
+Real issues hit: (1) `example3.csv` was actually a binary Excel file renamed to `.csv` — caused `UnicodeDecodeError: 'utf-8' codec can't decode byte 0xaa` — fixed by creating a real plaintext CSV with `write_text()`. (2) XML `ParseError: not well-formed` — caused by line breaks inside attribute values in the XML string (e.g. `xmlns:xsi=\n"http://..."`) — fixed by reformatting the XML string to keep each tag on its own line without breaking mid-attribute.
+
+**Learned (vs C#):** `json.loads()` / `json.dumps()` map directly to C#'s `JsonSerializer.Deserialize<T>()` / `JsonSerializer.Serialize()` — same concept (JSON string ↔ object), just dynamic typing means no generic type parameter needed in Python. JSON `null` → Python `None`, JSON `true`/`false` → Python `True`/`False` — the casing difference is a real gotcha when switching between languages. `DictReader` is more useful than plain `csv.reader` for real-world CSV files that have headers — accessing `row['Timestamp']` is much cleaner than `row[0]`. `DictWriter` handles column ordering automatically — you define the field names once in the constructor and it doesn't matter what order you pass keys in the dict, which is genuinely cleaner than managing column indices manually. XML is significantly more verbose than JSON for the same data — `json.loads()` one-lines what takes multiple `ET.fromstring()` + indexing calls to navigate. `newline=''` on `open()` for CSV writing prevents Windows from adding double newlines — Python's text mode adds `\r\n` and csv.writer also adds `\r\n`, causing blank lines between every row without it.
 
 ---
 
